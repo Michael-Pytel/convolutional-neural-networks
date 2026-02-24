@@ -1,2 +1,2 @@
 # convolutional-neural-networks
-First project for Deep learning course at Data Science masters - Wasaw University of Technology
+First project for Deep learning course at Data Science M.Sc. - Wasaw University of Technology
