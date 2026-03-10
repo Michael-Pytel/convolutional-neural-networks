@@ -1,0 +1,10 @@
+DATA_DIR = "./cinic10"
+RESULTS_DIR = "./results"
+
+EPOCHS = 20
+
+SEEDS = [0,1,2]
+
+DEVICE = "cuda"
+
+EARLY_STOPPING_PATIENCE = 5

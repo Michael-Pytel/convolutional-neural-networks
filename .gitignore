@@ -1,3 +1,5 @@
 venv/
 cinic10/
 *.pth
+__pycache__/
+/results/
