@@ -32,11 +32,12 @@ def get_dataloaders(batch_size):
     batch_size=batch_size,
     shuffle=True,
     num_workers=8,
-    pin_memory=True
+    pin_memory=True,
+    persistent_workers=True
     )
 
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, num_workers=8, pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, num_workers=8, pin_memory=True, persistent_workers=True)
 
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, num_workers=8, pin_memory=True)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, num_workers=8, pin_memory=True, persistent_workers=True)
 
     return train_loader, val_loader, test_loader

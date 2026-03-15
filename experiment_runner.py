@@ -26,10 +26,14 @@ def random_search(search_space, n_samples, seed=None):
         yield dict(zip(keys, combo))
 
 
-def run_all_experiments(search_space, n_samples=10):
+def run_all_experiments(search_space, n_samples=10, folder=None):
 
+    if folder is None:
+        results_dir = RESULTS_DIR
+    else:
+        results_dir = os.path.join(RESULTS_DIR, folder)
 
-    os.makedirs(RESULTS_DIR, exist_ok=True)
+    os.makedirs(results_dir, exist_ok=True)
 
     experiment_id = 0
     models = search_space["model"]
@@ -49,7 +53,7 @@ def run_all_experiments(search_space, n_samples=10):
                 
                
                 model_path = os.path.join(
-                    RESULTS_DIR,
+                    results_dir,
                     f"best_model_exp{experiment_id}_{model_name}_seed{seed}.pth"
                 )
 
@@ -58,7 +62,7 @@ def run_all_experiments(search_space, n_samples=10):
 
            
             path = os.path.join(
-                RESULTS_DIR,
+                results_dir,
                 f"experiment_{experiment_id}_{model_name}.json"
             )
             with open(path, "w") as f:
@@ -82,11 +86,10 @@ def run_single(config, seed, model_path="best_model.pth"):
         weight_decay=config["weight_decay"]
     )
 
-    scheduler = torch.optim.lr_scheduler.StepLR(
-        optimizer,
-        step_size=5,
-        gamma=0.5
-    )
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+    optimizer,
+    T_max=EPOCHS
+)
 
     logs = train_model(
         model,
@@ -100,7 +103,7 @@ def run_single(config, seed, model_path="best_model.pth"):
     )
 
 
-    model.load_state_dict(torch.load(model_path))
+    model.load_state_dict(torch.load(model_path, map_location=device))
 
     cm_val = evaluate_predictions(model, val_loader, device)
     cm_test = evaluate_predictions(model, test_loader, device)

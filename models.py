@@ -97,5 +97,8 @@ def get_model(name, dropout):
     if name == "smallcnn":
         return SmallCNN(dropout)
 
-    if name == "bigcnn":
+    elif name == "bigcnn":
         return BigCNN(dropout)
+
+    else:
+        raise ValueError(f"Unknown model: {name}")

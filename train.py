@@ -11,13 +11,14 @@ def validate(model, loader, device):
     loss_total = 0
     n = 0
 
+    use_amp = device.type == "cuda"
     with torch.inference_mode():
         for images, labels in loader:
             images = images.to(device)
             labels = labels.to(device)
 
             
-            with torch.amp.autocast(device_type="cuda"):
+            with torch.amp.autocast(device_type="cuda", enabled=use_amp):
                 outputs = model(images)
                 loss = criterion(outputs, labels)
 
@@ -36,7 +37,8 @@ def train_model(model, train_loader, val_loader, optimizer, scheduler, epochs, d
     )
 
     logs = {"train_loss": [], "val_loss": []}
-    scaler = torch.amp.GradScaler()
+    use_amp = device.type == "cuda"
+    scaler = torch.amp.GradScaler(enabled=use_amp)
 
     for epoch in range(epochs):
         model.train()
@@ -49,7 +51,7 @@ def train_model(model, train_loader, val_loader, optimizer, scheduler, epochs, d
 
             optimizer.zero_grad(set_to_none=True)
 
-            with torch.amp.autocast(device_type="cuda"):
+            with torch.amp.autocast(device_type="cuda", enabled=use_amp):
                 outputs = model(images)
                 loss = criterion(outputs, labels)
 

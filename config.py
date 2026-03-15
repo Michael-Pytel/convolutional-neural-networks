@@ -1,9 +1,9 @@
 DATA_DIR = "./cinic10"
 RESULTS_DIR = "./results"
 
-EPOCHS = 20
+EPOCHS = 30
 
-SEEDS = [0,1,2]
+SEEDS = [0,1,2,3,4]
 
 DEVICE = "cuda"
 
