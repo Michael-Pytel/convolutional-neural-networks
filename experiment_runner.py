@@ -1,95 +1,46 @@
+import itertools
 import os
 import json
 import random
+import torch
+import itertools
+
 from config import RESULTS_DIR, SEEDS, EPOCHS, DEVICE
 from utils import set_seed
 from datasets import get_dataloaders
 from models import get_model
 from train import train_model
 from metrics import evaluate_predictions, confusion_stats
-import itertools
-import torch
 
 
 device = torch.device(DEVICE if torch.cuda.is_available() else "cpu")
 
 
-def random_search(search_space, n_samples, seed=None):
-    keys = [k for k in search_space.keys() if k != "model"]
-    all_combinations = list(itertools.product(*[search_space[k] for k in keys]))
+def random_search(space, n_samples, seed=42):
+    keys = [k for k in space if k != "model"]
+    all_configs = list(itertools.product(*(space[k] for k in keys)))
 
-    if seed is not None:
-        random.seed(seed)
+    rng = random.Random(seed)
+    rng.shuffle(all_configs)
 
-    random.shuffle(all_combinations)
-    for combo in all_combinations[:n_samples]:
-        yield dict(zip(keys, combo))
+    for config in all_configs[:n_samples]:
+        yield dict(zip(keys, config))
 
 
-def run_all_experiments(search_space, n_samples=10, folder=None):
-
-    if folder is None:
-        results_dir = RESULTS_DIR
-    else:
-        results_dir = os.path.join(RESULTS_DIR, folder)
-
-    os.makedirs(results_dir, exist_ok=True)
-
-    experiment_id = 0
-    models = search_space["model"]
-
-    for base_config in random_search(search_space, n_samples=n_samples, seed=42):
-        print("Base hyperparameters:", base_config)
-
-        for model_name in models:
-            config = base_config.copy()
-            config["model"] = model_name
-            print("Running model:", model_name, "with config:", config)
-
-            results = []
-
-            for seed in SEEDS:
-                print("Seed:", seed)
-                
-               
-                model_path = os.path.join(
-                    results_dir,
-                    f"best_model_exp{experiment_id}_{model_name}_seed{seed}.pth"
-                )
-
-                result = run_single(config, seed, model_path=model_path)
-                results.append(result)
-
-           
-            path = os.path.join(
-                results_dir,
-                f"experiment_{experiment_id}_{model_name}.json"
-            )
-            with open(path, "w") as f:
-                json.dump({
-                    "config": config,
-                    "runs": results
-                }, f)
-
-        experiment_id += 1
-
-def run_single(config, seed, model_path="best_model.pth"):
+def run_single(config, seed, model_path):
+    print(f"Seed: {seed}, Config: {json.dumps(config)}")
     set_seed(seed)
 
-    train_loader, val_loader, test_loader = get_dataloaders(config["batch_size"])
+    train_loader, val_loader, test_loader = get_dataloaders(
+        config["batch_size"],
+        use_augmentation=config.get("augmentation", True)
+    )
 
     model = get_model(config["model"], config["dropout"]).to(device)
 
-    optimizer = torch.optim.AdamW(
-        model.parameters(),
-        lr=config["lr"],
-        weight_decay=config["weight_decay"]
-    )
+    optimizer = torch.optim.AdamW(model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"])
 
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-    optimizer,
-    T_max=EPOCHS
-)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
 
     logs = train_model(
         model,
@@ -99,19 +50,48 @@ def run_single(config, seed, model_path="best_model.pth"):
         scheduler,
         EPOCHS,
         device,
-        model_path=model_path
+        model_path,
+        mix_type=config.get("mix_type"),
+        alpha=config.get("alpha", 1.0),
+        mix_prob=config.get("mix_prob", 1.0)
     )
-
 
     model.load_state_dict(torch.load(model_path, map_location=device))
 
     cm_val = evaluate_predictions(model, val_loader, device)
     cm_test = evaluate_predictions(model, test_loader, device)
 
-    return {
+    return model, {
         "logs": logs,
-        "val_stats": confusion_stats(cm_val),
-        "test_stats": confusion_stats(cm_test)
+        "val": confusion_stats(cm_val),
+        "test": confusion_stats(cm_test)
     }
 
 
+def run_all_experiments(search_space, n_samples=10, folder=None):
+    if folder is None:
+        results_dir = RESULTS_DIR
+    else:
+        results_dir = os.path.join(RESULTS_DIR, folder)
+
+    os.makedirs(results_dir, exist_ok=True)
+
+    exp_id = 0
+
+    for base in random_search(search_space, n_samples):
+        all_models = []
+
+        for model_name in search_space["model"]:
+            config = {**base, "model": model_name}
+
+            results = []
+            for seed in SEEDS:
+                path = os.path.join(results_dir, f"model_{exp_id}_{model_name}_{seed}.pth")
+                model, res = run_single(config, seed, path)
+                results.append(res)
+                all_models.append(model)
+
+            with open(os.path.join(results_dir, f"exp_{exp_id}_{model_name}.json"), "w") as f:
+                json.dump({"config": config, "runs": results}, f, indent=2)
+
+        exp_id += 1
