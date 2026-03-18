@@ -7,7 +7,8 @@ from config import DATA_DIR
 
 cinic_mean = [0.47889522, 0.47227842, 0.43047404]
 cinic_std = [0.24205776, 0.23828046, 0.25874835]
-
+imagenet_mean = [0.485, 0.456, 0.406]
+imagenet_std = [0.229, 0.224, 0.225]
 
 def get_subset_indices(dataset, k, seed=0):
     random.seed(seed)
@@ -25,26 +26,36 @@ def get_subset_indices(dataset, k, seed=0):
     return selected
 
 
-def get_dataloaders(batch_size, use_augmentation=True, few_shot_k=None, seed=0):
+def get_dataloaders(batch_size, use_augmentation=True, few_shot_k=None, seed=0, model_name=None):
     num_workers = min(8, os.cpu_count() or 1)
     persistent = num_workers > 0
 
+    if model_name == "resnet18":
+        resize = 224
+        mean, std = imagenet_mean, imagenet_std
+    else:
+        resize = 32
+        mean, std = cinic_mean, cinic_std
+
     if use_augmentation:
         train_transform = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
+            transforms.Resize(resize),
+            transforms.RandomCrop(resize, padding=4),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
-            transforms.Normalize(cinic_mean, cinic_std)
+            transforms.Normalize(mean, std)
         ])
     else:
         train_transform = transforms.Compose([
+            transforms.Resize(resize),
             transforms.ToTensor(),
-            transforms.Normalize(cinic_mean, cinic_std)
+            transforms.Normalize(mean, std)
         ])
 
     transform = transforms.Compose([
+        transforms.Resize(resize),
         transforms.ToTensor(),
-        transforms.Normalize(cinic_mean, cinic_std)
+        transforms.Normalize(mean, std)
     ])
 
     train_dataset = torchvision.datasets.ImageFolder(
