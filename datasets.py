@@ -41,6 +41,7 @@ def get_dataloaders(batch_size, use_augmentation=True, few_shot_k=None, seed=0, 
         train_transform = transforms.Compose([
             transforms.Resize(resize),
             transforms.RandomCrop(resize, padding=4),
+            transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean, std)

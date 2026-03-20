@@ -54,6 +54,9 @@ def summarize(df, groupby_cols):
 
         mean_val_acc=("val_acc", "mean"),
         mean_val_f1=("val_macro_f1", "mean"),
+
+        mean_test_macro_f1=("test_macro_f1", "mean"),
+        std_test_macro_f1=("test_macro_f1", "std")
     ).reset_index()
 
     return summary.sort_values("mean_acc", ascending=False)
@@ -83,17 +86,17 @@ def plot_metric(df, x, y="test_acc", hue=None):
 
 
 def boxplot_metric(df, x, y="test_acc"):
-    plt.figure()
-    df.boxplot(column=y, by=x)
+    import seaborn as sns
 
-    plt.title(f"{y} grouped by {x}")
-    plt.suptitle("")
-    plt.xlabel(x)
-    plt.ylabel(y)
+    plt.figure(figsize=(8, 5))
 
+    sns.boxplot(data=df, x=x, y=y, hue="model")
+
+    plt.title(f"{y} grouped by {x} and model")
     plt.xticks(rotation=45)
     plt.grid()
 
+    plt.tight_layout()
     plt.show()
 
 
@@ -140,7 +143,9 @@ def correlation_plot(df):
 
 
 
-def get_best_configs(df, top_k=5, metric="test_acc"):
+def get_best_configs(df, top_k=5, metric="test_acc", model=None):
+    if model is not None:
+        df = df[df["model"] == model]
     return df.sort_values(metric, ascending=False).head(top_k)
 
 

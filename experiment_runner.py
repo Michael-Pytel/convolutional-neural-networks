@@ -88,8 +88,18 @@ def run_single(config, seed, model_path):
         "test": confusion_stats(cm_test)
     }
 
+def generate_configs(search_space=None, n_samples=10, configs_list=None, seed=42):
+    if configs_list is not None:
+        for cfg in configs_list:
+            yield cfg
 
-def run_all_experiments(search_space, n_samples=10, folder=None):
+    elif search_space is not None:
+        yield from random_search(search_space, n_samples, seed)
+
+    else:
+        raise ValueError("Provide either search_space or configs_list")
+
+def run_all_experiments(search_space=None, n_samples=10, configs_list=None, folder=None):
     if folder is None:
         results_dir = RESULTS_DIR
     else:
@@ -99,7 +109,11 @@ def run_all_experiments(search_space, n_samples=10, folder=None):
 
     exp_id = 0
 
-    for config in random_search(search_space, n_samples):
+    for config in generate_configs(
+        search_space=search_space,
+        n_samples=n_samples,
+        configs_list=configs_list
+    ):
 
         results = []
         for seed in SEEDS:
