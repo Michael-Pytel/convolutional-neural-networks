@@ -54,10 +54,11 @@ def run_single(config, seed, model_path):
     train_loader, val_loader, test_loader = get_dataloaders(
         config["batch_size"],
         use_augmentation=config.get("augmentation", True),
-        model_name=config["model"]
+        model_name=config["model"],
+        few_shot_k=config.get("few_shot_k", None),
     )
 
-    model = get_model(config["model"], config["dropout"]).to(device)
+    model = get_model(config["model"], config.get("dropout", 0)).to(device)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"])
 
@@ -73,8 +74,10 @@ def run_single(config, seed, model_path):
         device,
         model_path,
         mix_type=config.get("mix_type"),
-        alpha=config.get("alpha", 1.0),
-        mix_prob=config.get("mix_prob", 1.0)
+        mixup_alpha=config.get("mixup_alpha", 1.0),
+        cutmix_alpha=config.get("cutmix_alpha", 1.0),
+        mix_prob=config.get("mix_prob", 0.5),
+        p_mixup=config.get("p_mixup", 1.0)
     )
 
     model.load_state_dict(torch.load(model_path, map_location=device))

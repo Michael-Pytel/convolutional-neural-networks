@@ -1,7 +1,7 @@
 DATA_DIR = "./cinic10"
 RESULTS_DIR = "./results"
 
-EPOCHS = 50
+EPOCHS = 100
 
 SEEDS = [0,1,2]
 

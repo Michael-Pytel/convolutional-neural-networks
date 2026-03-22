@@ -75,7 +75,7 @@ def validate(model, loader, device):
 
 
 def train_model(model, train_loader, val_loader, optimizer, scheduler, epochs, device, model_path,
-                mix_type=None, alpha=1.0, mix_prob=1.0):
+                mix_type=None, mixup_alpha=1.0, cutmix_alpha=1.0, mix_prob=1, p_mixup=0.5):
 
     criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
     early_stopping = EarlyStopping(patience=EARLY_STOPPING_PATIENCE, path=model_path)
@@ -93,24 +93,27 @@ def train_model(model, train_loader, val_loader, optimizer, scheduler, epochs, d
             labels = labels.to(device)
 
             optimizer.zero_grad(set_to_none=True)
+            
+            if mix_type is not None:
+                use_mix = np.random.rand() < mix_prob
+            else:
+                use_mix = False
+            if use_mix:
+                if mix_type == "mixup":
+                    images, y_a, y_b, lam = mixup_data(images, labels, mixup_alpha)
 
-            if mix_type == "mixup":
-                images, y_a, y_b, lam = mixup_data(images, labels, alpha)
+                elif mix_type == "cutmix":
+                    images, y_a, y_b, lam = cutmix_data(images, labels, cutmix_alpha)
 
-            elif mix_type == "cutmix":
-                images, y_a, y_b, lam = cutmix_data(images, labels, alpha)
-
-            elif mix_type == "both":
-                if np.random.rand() < mix_prob:
-                    if np.random.rand() < 0.5:
-                        images, y_a, y_b, lam = mixup_data(images, labels, alpha)
+                elif mix_type == "both":
+                    if np.random.rand() < p_mixup:
+                        images, y_a, y_b, lam = mixup_data(images, labels, mixup_alpha)
                     else:
-                        images, y_a, y_b, lam = cutmix_data(images, labels, alpha)
-                else:
-                    y_a, y_b, lam = labels, labels, 1
-
+                        images, y_a, y_b, lam = cutmix_data(images, labels, cutmix_alpha)
             else:
                 y_a, y_b, lam = labels, labels, 1
+
+
 
             with torch.amp.autocast(device_type="cuda", enabled=device.type == "cuda"):
                 outputs = model(images)
