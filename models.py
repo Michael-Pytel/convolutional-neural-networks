@@ -1,6 +1,7 @@
+import torch
 import torch.nn as nn
 import torchvision.models as models
-
+from few_shot import ProtoNet
 
 class CNN(nn.Module):
     def __init__(self, dropout=0.3):
@@ -82,14 +83,49 @@ class ResNet18(nn.Module):
     def forward(self, x):
         return self.model(x)
 
+class BackboneWrapper(nn.Module):
+    def __init__(self, model, model_type):
+        super().__init__()
+        self.model_type = model_type
 
-def get_model(name, dropout):
+        if model_type == "cnn":
+            self.features = model.features
+            self.pool = model.pool
+
+        elif model_type == "resnet18":
+            self.features = nn.Sequential(*list(model.model.children())[:-1])
+
+        else:
+            raise ValueError("Unsupported model type")
+
+    def forward(self, x):
+        x = self.features(x)
+
+        if self.model_type == "cnn":
+            x = self.pool(x)
+
+        return torch.flatten(x, 1)
+
+def get_model(name, dropout, for_protonet=False):
 
     if name == "cnn":
-        return CNN(dropout)
+        model = CNN(dropout)
+        feat_dim = 384
 
     elif name == "resnet18":
-        return ResNet18(dropout)
-    
+        model = ResNet18(dropout)
+        feat_dim = 512
+
     else:
         raise ValueError(f"Unknown model: {name}")
+
+    if for_protonet:
+        backbone = BackboneWrapper(model, name)
+
+        return ProtoNet(
+            backbone=backbone,
+            feat_dim=feat_dim,
+            proj_dim=128
+        )
+
+    return model
