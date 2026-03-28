@@ -9,13 +9,11 @@ import matplotlib.gridspec as gridspec
 import warnings
 warnings.filterwarnings("ignore")
 
-# ── Paths ────────────────────────────────────────────────────────────────────
 _HERE      = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR   = os.path.join(_HERE, "../exp1_hparams")
 OUTPUT_DIR = os.path.join(_HERE, "../plots/hparams")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# ── Style ─────────────────────────────────────────────────────────────────────
 DARK_BG   = "white"
 CARD_BG   = "white"
 ACCENT_A  = "#2563eb"   
@@ -51,7 +49,6 @@ plt.rcParams.update({
 })
 
 
-# ── Data loading ──────────────────────────────────────────────────────────────
 def load_experiments(pattern):
     records = []
     for fp in sorted(glob.glob(os.path.join(DATA_DIR, pattern))):
@@ -61,8 +58,6 @@ def load_experiments(pattern):
         val_accs   = [r["val"]["accuracy"]     for r in d["runs"]]
         macro_f1s  = [r["test"]["macro_f1"]    for r in d["runs"]]
         per_class_f1s = np.mean([r["test"]["f1"] for r in d["runs"]], axis=0)
-
-        # val_acc curves (last epoch of each run)
         val_curves = [r["logs"]["val_acc"] for r in d["runs"]]
 
         records.append({
@@ -143,7 +138,6 @@ def plot_hp_scatter():
         ax.set_xlabel("Learning Rate (log scale)"); ax.set_ylabel("Mean Test Accuracy")
         ax.set_title(title, color="black"); ax.grid(alpha=0.35)
 
-    # Shared legends
     dropout_handles = [mpatches.Patch(color=DROPOUT_COLORS[d], label=f"dropout={d}")
                        for d in sorted(DROPOUT_COLORS)]
     size_handles = [Line2D([0], [0], marker="o", color="w", markerfacecolor=MUTED,
@@ -233,7 +227,6 @@ def plot_perclass_f1_heatmap():
                                      [best_cnn, best_res],
                                      ["CNN", "ResNet18"],
                                      ["Blues", "Oranges"]):
-        # per-run F1 matrix (runs x classes)
         raw = json.load(open(
             glob.glob(os.path.join(DATA_DIR,
                  f"exp_{rec['exp']}_{'cnn' if rec['model']=='cnn' else 'resnet18'}.json"))[0]))

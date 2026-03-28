@@ -1,18 +1,3 @@
-"""
-Few-Shot Learning (ProtoNet) — Visualisation Suite
-===================================================
-Model: Prototypical Network
-Backbones: ResNet18, CNN
-k-shot settings: 5, 10, 15  |  3 runs each
-
-Plots generated
-  1. fewshot_plot1_efficiency.png  — grouped bar chart: test acc by k-shot,
-                                     with fully-supervised & random-chance refs
-  2. fewshot_plot2_curves.png      — train loss + val acc (dual axis) per cell
-  3. fewshot_plot3_overfitting.png — train vs val accuracy gap per model
-  4. fewshot_plot4_val_loss.png    — train loss + val loss on same axis per cell
-"""
-
 import json, os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -280,8 +265,6 @@ def plot_train_val_loss():
                 dpi=150, bbox_inches="tight")
     plt.close(); print("✓ Plot 4 saved")
 
-
-# ── Run all ───────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     print("Generating few-shot plots...\n")
     plot_shot_efficiency()
