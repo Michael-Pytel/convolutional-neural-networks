@@ -4,7 +4,7 @@ import random
 import torch
 import random
 import math
-
+from setup_runpod import optimize_runpod_storage
 from config import RESULTS_DIR, SEEDS, EPOCHS, DEVICE
 from utils import set_seed
 from datasets import get_dataloaders
@@ -59,6 +59,8 @@ def run_single(config, seed, model_path):
 
     model = get_model(config["model"], config["dropout"]).to(device)
 
+    model = torch.compile(model)
+
     optimizer = torch.optim.AdamW(model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"])
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
@@ -100,6 +102,10 @@ def generate_configs(search_space=None, n_samples=10, configs_list=None, seed=42
         raise ValueError("Provide either search_space or configs_list")
 
 def run_all_experiments(search_space=None, n_samples=10, configs_list=None, folder=None):
+
+    print("Checking storage configuration...")
+    optimize_runpod_storage()
+
     if folder is None:
         results_dir = RESULTS_DIR
     else:
