@@ -76,7 +76,7 @@ def run_single(config, seed, model_path):
         mix_type=config.get("mix_type"),
         mixup_alpha=config.get("mixup_alpha", 1.0),
         cutmix_alpha=config.get("cutmix_alpha", 1.0),
-        mix_prob=config.get("mix_prob", 0.5),
+        mix_prob=config.get("mix_prob", 1),
         p_mixup=config.get("p_mixup", 0.5)
     )
 
