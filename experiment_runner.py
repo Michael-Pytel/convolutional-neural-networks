@@ -77,7 +77,7 @@ def run_single(config, seed, model_path):
         mixup_alpha=config.get("mixup_alpha", 1.0),
         cutmix_alpha=config.get("cutmix_alpha", 1.0),
         mix_prob=config.get("mix_prob", 0.5),
-        p_mixup=config.get("p_mixup", 1.0)
+        p_mixup=config.get("p_mixup", 0.5)
     )
 
     model.load_state_dict(torch.load(model_path, map_location=device))
