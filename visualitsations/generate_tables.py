@@ -1,8 +1,3 @@
-"""
-Generate LaTeX appendix tables for exp1-exp4.
-Only accuracy is reported (test accuracy mean+-std, val accuracy where available).
-Output: ../tables/*.tex
-"""
 import json, glob, os
 import numpy as np
 
