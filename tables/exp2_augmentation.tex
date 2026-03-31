@@ -1,0 +1,31 @@
+\begin{table}[H]
+\centering
+\caption{Exp.\ 2 --- Augmentation strategy comparison for CNN and ResNet18. Each condition is evaluated over 3 independent runs. Best test accuracy per model is highlighted in \textbf{bold}.}
+\label{tab:exp2_aug}
+\small
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Model} & \textbf{Condition} & \textbf{Std Aug} & \textbf{Mix Strategy} & \textbf{Test Acc} ($\mu\pm\sigma$) & \textbf{Val Acc} ($\mu\pm\sigma$) \\
+\midrule
+\textbf{CNN} & Baseline & --- & --- & $0.7614 \pm 0.0027$ & $0.7647 \pm 0.0018$ \\
+ & Mixup & --- & Mixup & $0.7713 \pm 0.0015$ & $0.7740 \pm 0.0009$ \\
+ & CutMix & --- & Cutmix & $0.7824 \pm 0.0009$ & $0.7854 \pm 0.0020$ \\
+ & Mixup + CutMix & --- & Mixup + CutMix & $0.7792 \pm 0.0025$ & $0.7825 \pm 0.0025$ \\
+ & Std Aug & \checkmark & --- & $0.8180 \pm 0.0030$ & $0.8224 \pm 0.0027$ \\
+ & Std Aug + Mixup & \checkmark & Mixup & $0.7966 \pm 0.0047$ & $0.7994 \pm 0.0050$ \\
+ & Std Aug + CutMix & \checkmark & Cutmix & $0.8190 \pm 0.0045$ & $0.8213 \pm 0.0052$ \\
+ & Std Aug + Mixup + CutMix & \checkmark & Mixup + CutMix & \textbf{0.8259}$\pm 0.0013$ & $0.8279 \pm 0.0014$ \\
+\midrule
+\textbf{ResNet18} & Baseline & --- & --- & $0.8726 \pm 0.0018$ & $0.8741 \pm 0.0011$ \\
+ & Mixup & --- & Mixup & $0.8802 \pm 0.0029$ & $0.8819 \pm 0.0024$ \\
+ & CutMix & --- & Cutmix & $0.8838 \pm 0.0008$ & $0.8852 \pm 0.0006$ \\
+ & Mixup + CutMix & --- & Mixup + CutMix & $0.8859 \pm 0.0017$ & $0.8877 \pm 0.0017$ \\
+ & Std Aug & \checkmark & --- & $0.8855 \pm 0.0007$ & $0.8871 \pm 0.0006$ \\
+ & Std Aug + Mixup & \checkmark & Mixup & $0.8884 \pm 0.0013$ & $0.8903 \pm 0.0008$ \\
+ & Std Aug + CutMix & \checkmark & Cutmix & \textbf{0.8937}$\pm 0.0019$ & $0.8953 \pm 0.0015$ \\
+ & Std Aug + Mixup + CutMix & \checkmark & Mixup + CutMix & $0.8909 \pm 0.0018$ & $0.8929 \pm 0.0020$ \\
+\midrule
+\bottomrule
+\end{tabular}
+\\[4pt]\footnotesize \checkmark\ = standard augmentation (random crop + horizontal flip). Mix strategies are applied on top of (or independently from) standard augmentation.
+\end{table}

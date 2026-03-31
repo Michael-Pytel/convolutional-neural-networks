@@ -1,0 +1,25 @@
+\begin{table}[H]
+\centering
+\caption{Exp.\ 3 --- ProtoNet few-shot test accuracy vs classic supervised baseline for CNN and ResNet18 on CINIC-10. ProtoNet results are averaged over 3 independent runs per k-shot setting. Gap = ProtoNet accuracy $-$ classic accuracy.}
+\label{tab:exp3_fewshot}
+\small
+\begin{tabular}{llccc}
+\toprule
+\textbf{Model} & \textbf{Method} & \textbf{k-Shot} & \textbf{Test Acc} ($\mu\pm\sigma$) & \textbf{Gap vs Classic} \\
+\midrule
+\textbf{CNN} & Classic (Supervised) & --- & $0.2934 \pm 0.0084$ & --- \\
+\midrule
+ & ProtoNet & 5 & $0.2530 \pm 0.0044$ & $-0.0404$ \\
+ & ProtoNet & 10 & $0.2632 \pm 0.0049$ & $-0.0302$ \\
+ & ProtoNet & 15 & $0.2659 \pm 0.0029$ & $-0.0276$ \\
+\midrule
+\textbf{ResNet18} & Classic (Supervised) & --- & $0.5793 \pm 0.0068$ & --- \\
+\midrule
+ & ProtoNet & 5 & $0.5984 \pm 0.0046$ & $+0.0191$ \\
+ & ProtoNet & 10 & $0.5954 \pm 0.0021$ & $+0.0161$ \\
+ & ProtoNet & 15 & $0.5904 \pm 0.0032$ & $+0.0111$ \\
+\midrule
+\bottomrule
+\end{tabular}
+\\[4pt]\footnotesize Negative gap indicates few-shot underperforms the classic baseline. Classic models are trained with standard supervised training using only \textbf{20 samples per class} (200 labelled images total), matching the same data budget as the few-shot setting.
+\end{table}

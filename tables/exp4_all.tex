@@ -1,0 +1,27 @@
+\begin{table}[H]
+\centering
+\caption{Exp.\ 4 --- All ensemble methods (voting and stacking) and their test accuracy on CINIC-10. Best result across all methods is highlighted in \textbf{bold}.}
+\label{tab:exp4_all}
+\small
+\begin{tabular}{lc}
+\toprule
+\textbf{Method} & \textbf{Test Accuracy} \\
+\midrule
+\multicolumn{2}{l}{\textit{Voting methods}} \\
+\midrule
+Hard Voting & 0.9093 \\
+Soft Voting & 0.9107 \\
+Weighted Voting & 0.9107 \\
+\midrule
+\multicolumn{2}{l}{\textit{Stacking methods}} \\
+\midrule
+Logistic Regression & 0.9105 \\
+Ridge & 0.9108 \\
+Random Forest & 0.9108 \\
+Gradient Boosting & 0.9072 \\
+SVM & \textbf{0.9110} \\
+k-NN & 0.9012 \\
+\bottomrule
+\end{tabular}
+\\[4pt]\footnotesize Base models: five ResNet18 checkpoints selected from Exp.\ 1. Stacking meta-classifiers are trained on held-out softmax probability vectors.
+\end{table}

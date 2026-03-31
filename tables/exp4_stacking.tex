@@ -1,0 +1,18 @@
+\begin{table}[H]
+\centering
+\caption{Exp.\ 4 --- Ensemble stacking classifiers trained on the concatenated softmax outputs of the five base ResNet18 models. Best accuracy across all ensemble methods is highlighted in \textbf{bold}.}
+\label{tab:exp4_stacking}
+\small
+\begin{tabular}{lc}
+\toprule
+\textbf{Method} & \textbf{Test Accuracy} \\
+\midrule
+Logistic Regression & 0.9105 \\
+Ridge & 0.9108 \\
+Random Forest & 0.9108 \\
+Gradient Boosting & 0.9072 \\
+SVM & \textbf{0.9110} \\
+k-NN & 0.9012 \\
+\bottomrule
+\end{tabular}
+\end{table}
