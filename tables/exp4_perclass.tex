@@ -1,0 +1,27 @@
+\begin{table}[H]
+\centering
+\caption{Exp.\ 4 — Per-class test F1 for all ensemble methods (voting and stacking). Classes correspond to CINIC-10 categories.}
+\label{tab:exp4_perclass}
+\small
+\begin{tabular}{lccccccccccc}
+\toprule
+\textbf{Method} & \textbf{Airplane} & \textbf{Automobile} & \textbf{Bird} & \textbf{Cat} & \textbf{Deer} & \textbf{Dog} & \textbf{Frog} & \textbf{Horse} & \textbf{Ship} & \textbf{Truck} & \textbf{Mean} \\
+\midrule
+\multicolumn{12}{l}{\textit{Voting methods}} \\
+\midrule
+Hard Voting & 0.9478 & 0.8951 & 0.9188 & 0.8751 & 0.8868 & 0.8499 & 0.9611 & 0.9337 & 0.9352 & 0.8885 & 0.9092 \\
+Soft Voting & 0.9510 & 0.8970 & 0.9209 & 0.8766 & 0.8885 & 0.8515 & 0.9610 & 0.9340 & 0.9364 & 0.8889 & 0.9106 \\
+Weighted Voting & 0.9510 & 0.8970 & 0.9209 & 0.8766 & 0.8885 & 0.8515 & 0.9610 & 0.9340 & 0.9364 & 0.8889 & 0.9106 \\
+\midrule
+\multicolumn{12}{l}{\textit{Stacking methods}} \\
+\midrule
+Logistic Regression & 0.9513 & 0.8975 & 0.9209 & 0.8752 & 0.8890 & 0.8489 & 0.9623 & 0.9333 & 0.9373 & 0.8889 & 0.9105 \\
+Ridge & 0.9499 & 0.8967 & 0.9220 & 0.8773 & 0.8901 & 0.8516 & 0.9613 & 0.9338 & 0.9354 & 0.8891 & 0.9107 \\
+Random Forest & 0.9510 & 0.8971 & 0.9204 & 0.8745 & 0.8901 & 0.8524 & 0.9617 & 0.9342 & 0.9375 & 0.8883 & 0.9107 \\
+Gradient Boosting & 0.9477 & 0.8931 & 0.9182 & 0.8712 & 0.8844 & 0.8489 & 0.9587 & 0.9293 & 0.9344 & 0.8850 & 0.9071 \\
+SVM & 0.9504 & 0.8985 & 0.9211 & 0.8756 & 0.8897 & 0.8522 & 0.9611 & 0.9344 & 0.9368 & 0.8892 & 0.9109 \\
+k-NN & 0.9430 & 0.8827 & 0.9095 & 0.8603 & 0.8777 & 0.8392 & 0.9577 & 0.9281 & 0.9329 & 0.8803 & 0.9012 \\
+\midrule
+\bottomrule
+\end{tabular}
+\end{table}

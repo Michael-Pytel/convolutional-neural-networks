@@ -1,0 +1,16 @@
+\begin{table}[H]
+\centering
+\caption{Exp.\ 4 --- Ensemble voting methods. All methods combine the same five ResNet18 model checkpoints. Best accuracy across all ensemble methods is highlighted in \textbf{bold}.}
+\label{tab:exp4_voting}
+\small
+\begin{tabular}{lc}
+\toprule
+\textbf{Method} & \textbf{Test Accuracy} \\
+\midrule
+Hard Voting & 0.9093 \\
+Soft Voting & 0.9107 \\
+Weighted Voting & 0.9107 \\
+\bottomrule
+\end{tabular}
+\\[4pt]\footnotesize Weighted voting uses per-model validation accuracy as weights. Soft and weighted voting coincide when all models have equal validation performance.
+\end{table}

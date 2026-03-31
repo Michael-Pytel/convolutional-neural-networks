@@ -141,9 +141,10 @@ def plot_hp_scatter():
     dropout_handles = [mpatches.Patch(color=DROPOUT_COLORS[d], label=f"dropout={d}")
                        for d in sorted(DROPOUT_COLORS)]
     size_handles = [Line2D([0], [0], marker="o", color="w", markerfacecolor=MUTED,
-                           markersize=np.sqrt(s), label=f"bs={bs}", linewidth=0)
+                           markersize=np.sqrt(s), label=f"batch size={bs}", linewidth=0)
                     for bs, s in BATCH_SIZES.items()]
-    axes[1].legend(handles=dropout_handles + size_handles, loc="lower left", fontsize=8.5)
+    fig.legend(handles=dropout_handles + size_handles, fontsize=8.5, loc="lower center",
+               ncol=6, bbox_to_anchor=(0.5, -0.06), framealpha=0.95)
 
     plt.tight_layout()
     plt.savefig(f"{OUTPUT_DIR}/plot2_hp_scatter.png", dpi=150, bbox_inches="tight", facecolor="white")
@@ -213,47 +214,6 @@ def plot_learning_curves(top_n=5):
     print("✓ Plot 4 saved")
 
 
-def plot_perclass_f1_heatmap():
-    best_cnn = max(cnn_recs, key=lambda r: r["test_acc_mean"])
-    best_res = max(res_recs, key=lambda r: r["test_acc_mean"])
-
-    fig, axes = plt.subplots(1, 2, figsize=(13, 4))
-    fig.suptitle("Per-Class Test F1 — Best Configuration", fontsize=14, fontweight="bold", y=1.01)
-
-    n_classes = 10
-    class_labels = [f"Class {i}" for i in range(n_classes)]
-
-    for ax, rec, title, cmap in zip(axes,
-                                     [best_cnn, best_res],
-                                     ["CNN", "ResNet18"],
-                                     ["Blues", "Oranges"]):
-        raw = json.load(open(
-            glob.glob(os.path.join(DATA_DIR,
-                 f"exp_{rec['exp']}_{'cnn' if rec['model']=='cnn' else 'resnet18'}.json"))[0]))
-        matrix = np.array([run["test"]["f1"] for run in raw["runs"]])   # (3, 10)
-        mean_f1 = matrix.mean(axis=0, keepdims=True)  # (1, 10)
-        full = np.vstack([matrix, mean_f1])            # (4, 10)
-
-        im = ax.imshow(full, cmap=cmap, vmin=0.65, vmax=1.0, aspect="auto")
-        ax.set_xticks(range(n_classes)); ax.set_xticklabels(class_labels, rotation=35, fontsize=8, ha="right")
-        ax.set_yticks(range(4)); ax.set_yticklabels(["Run 1", "Run 2", "Run 3", "Mean"], fontsize=9)
-        plt.colorbar(im, ax=ax, label="F1 Score", fraction=0.03)
-
-        for i in range(full.shape[0]):
-            for j in range(full.shape[1]):
-                ax.text(j, i, f"{full[i, j]:.3f}", ha="center", va="center",
-                        fontsize=7, color="white" if full[i, j] < 0.85 else DARK_BG)
-
-        cfg = rec
-        ax.set_title(f"{title}  |  lr={cfg['lr']:.2e}  do={cfg['dropout']}  bs={cfg['batch_size']}\n"
-                     f"Mean Test Acc = {cfg['test_acc_mean']:.4f}", fontsize=9.5)
-
-    plt.tight_layout()
-    plt.savefig(f"{OUTPUT_DIR}/plot5_perclass_f1.png", dpi=150, bbox_inches="tight", facecolor="white")
-    plt.close()
-    print("✓ Plot 5 saved")
-
-
 def plot_val_vs_test():
     fig, ax = plt.subplots(figsize=(7.5, 6.5))
     fig.suptitle("Val vs Test Accuracy — Generalization Check", fontsize=14, fontweight="bold", y=0.99)
@@ -281,18 +241,30 @@ def plot_val_vs_test():
     all_test = [r["test_acc_mean"] for r in all_recs]
     lo = min(min(all_vals), min(all_test)) - 0.003
     hi = max(max(all_vals), max(all_test)) + 0.003
-    ax.plot([lo, hi], [lo, hi], "--", color=ACCENT_C, linewidth=1.2, alpha=0.6, label="y = x (perfect)")
+    ax.plot([lo, hi], [lo, hi], "--", color=ACCENT_C, linewidth=1.2, alpha=0.6, label="y = x  (above = test > val, ResNet18 tends here)")
     ax.fill_between([lo, hi], [lo - 0.005, hi - 0.005], [lo + 0.005, hi + 0.005],
                     color=ACCENT_C, alpha=0.07)
 
     ax.set_xlabel("Mean Validation Accuracy"); ax.set_ylabel("Mean Test Accuracy")
-    ax.legend(); ax.grid(alpha=0.35)
+    ax.grid(alpha=0.35)
     ax.set_aspect("equal"); ax.set_xlim(lo, hi); ax.set_ylim(lo, hi)
 
+    handles, _ = ax.get_legend_handles_labels()
+    handles += [
+        mpatches.Patch(facecolor=ACCENT_C, alpha=0.15, edgecolor="none",
+                       label="±0.005 tolerance band around y = x"),
+        Line2D([0],[0], color=ACCENT_A, lw=1, alpha=0.3,
+               marker="o", markersize=0, label="Error bars: x = val std, y = test std (CNN)"),
+        Line2D([0],[0], color=ACCENT_B, lw=1, alpha=0.3,
+               marker="s", markersize=0, label="Error bars: x = val std, y = test std (ResNet18)"),
+    ]
+    fig.legend(handles=handles, fontsize=8.5, loc="lower center",
+               ncol=2, bbox_to_anchor=(0.5, -0.14), framealpha=0.95)
+
     plt.tight_layout()
-    plt.savefig(f"{OUTPUT_DIR}/plot6_val_vs_test.png", dpi=150, bbox_inches="tight", facecolor="white")
+    plt.savefig(f"{OUTPUT_DIR}/plot5_val_vs_test.png", dpi=150, bbox_inches="tight", facecolor="white")
     plt.close()
-    print("✓ Plot 6 saved")
+    print("✓ Plot 5 saved")
 
 
 if __name__ == "__main__":
@@ -301,6 +273,5 @@ if __name__ == "__main__":
     plot_hp_scatter()
     plot_topk_bar()
     plot_learning_curves()
-    plot_perclass_f1_heatmap()
     plot_val_vs_test()
     print(f"\nAll plots saved to {OUTPUT_DIR}/")
